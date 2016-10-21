@@ -3,6 +3,11 @@ if has('gui')
   runtime macros/editexisting.vim
 endif
 
+"augroupの初期化
+augroup vimrc
+  autocmd!
+augroup END
+
 "行番号の表示	
 set number
 "yankしたテキストがクリップボードにも入るようにする
@@ -41,12 +46,12 @@ set tabstop=4
 set shiftwidth=4
 set softtabstop=0
 " set Filetype of .sv file
-au BufNewFile,BufRead *.sv setf systemverilog
+autocmd vimrc BufNewFile,BufRead *.sv setf systemverilog
 " indentation set to 2.
-autocmd FileType html,xhtml,css,xml set shiftwidth=2 softtabstop=2
-autocmd FileType vhdl,verilog,systemverilog set shiftwidth=2 softtabstop=2
+autocmd vimrc FileType html,xhtml,css,xml set shiftwidth=2 softtabstop=2
+autocmd vimrc FileType vhdl,verilog,systemverilog set shiftwidth=2 softtabstop=2
 " in makefiles, do not expand tabs to spaces
-autocmd FileType make set noexpandtab shiftwidth=4 softtabstop=0
+autocmd vimrc FileType make set noexpandtab shiftwidth=4 softtabstop=0
 
 "バックアップファイルを作らない
 set nobackup
@@ -56,7 +61,7 @@ if has('persistent_undo')
 	set undofile
 endif
 
-autocmd BufNewFile *.cpp 0r $HOME/.vim/template/cpp.txt
+autocmd vimrc BufNewFile *.cpp 0r $HOME/.vim/template/cpp.txt
 
 "NeoBundle Scripts-----------------------------
 if &compatible
@@ -79,16 +84,13 @@ NeoBundleCheck
 "End NeoBundle Scripts-------------------------
 
 " vim -b : edit binary using xxd-format!
-    augroup Binary
-    au!
-    au BufReadPre  *.bin let &bin=1
-    au BufReadPost *.bin if &bin | %!xxd
-    au BufReadPost *.bin set ft=xxd | endif
-    au BufWritePre *.bin if &bin | %!xxd -r
-    au BufWritePre *.bin endif
-    au BufWritePost *.bin if &bin | %!xxd
-    au BufWritePost *.bin set nomod | endif
-augroup END
+autocmd vimrc BufReadPre  *.bin let &bin=1
+autocmd vimrc BufReadPost *.bin if &bin | %!xxd
+autocmd vimrc BufReadPost *.bin set ft=xxd | endif
+autocmd vimrc BufWritePre *.bin if &bin | %!xxd -r
+autocmd vimrc BufWritePre *.bin endif
+autocmd vimrc BufWritePost *.bin if &bin | %!xxd
+autocmd vimrc BufWritePost *.bin set nomod | endif
 
 " indentLineを高速に
 let g:indentLine_faster = 1
@@ -108,19 +110,19 @@ let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
 let g:neocomplete#sources#dictionary#dictionaries = {'default' : ''}
 " Define keyword.
 if !exists('g:neocomplete#keyword_patterns')
-    let g:neocomplete#keyword_patterns = {}
+  let g:neocomplete#keyword_patterns = {}
 endif
 let g:neocomplete#keyword_patterns['default'] = '\h\w*'
 " Enable omni completion.
-autocmd FileType c set omnifunc=ccomplete#Complete
-autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-autocmd FileType java setlocal omnifunc=javacomplete#Complete
-autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-autocmd FileType php setlocal omnifunc=phpcomplete#CompletePHP
-autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
-autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+autocmd vimrc FileType c set omnifunc=ccomplete#Complete
+autocmd vimrc FileType css setlocal omnifunc=csscomplete#CompleteCSS
+autocmd vimrc FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+autocmd vimrc FileType java setlocal omnifunc=javacomplete#Complete
+autocmd vimrc FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+autocmd vimrc FileType python setlocal omnifunc=pythoncomplete#Complete
+autocmd vimrc FileType php setlocal omnifunc=phpcomplete#CompletePHP
+autocmd vimrc FileType ruby setlocal omnifunc=rubycomplete#Complete
+autocmd vimrc FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 " Enable heavy omni completion.
 if !exists('g:neocomplete#sources#omni#input_patterns')
   let g:neocomplete#sources#omni#input_patterns = {}
