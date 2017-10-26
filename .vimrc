@@ -97,7 +97,7 @@ set cmdheight=2
 "restore undo history
 if has('persistent_undo')
     if !isdirectory(expand('~/.vim/undo'))
-        call mkdir(expand('~/.vim/undo'))
+        call mkdir(expand('~/.vim/undo'), "p")
     endif
 	set undodir=~/.vim/undo
 	set undofile
