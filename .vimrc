@@ -1,141 +1,121 @@
-"既に開いているGVIMがあるときはそのVIMを前面にもってくる
-if has('gui')
-  runtime macros/editexisting.vim
-endif
+set nocompatible
 
-"augroupの初期化
-augroup vimrc
-  autocmd!
-augroup END
-
-"行番号の表示	
+"display line numbers
 set number
-"yankしたテキストがクリップボードにも入るようにする
-set clipboard=unnamed,autoselect
-"検索対象を打っている間から検索する
-set incsearch
-"大文字小文字を無視する、大文字が入力されると区別する
-set ignorecase
-set smartcase
-" 検索がファイルの末尾に達したら最初に戻る
-set wrapscan
-" 検索文字列をハイライトする
-set hlsearch
-"対応する括弧を表示
-set showmatch
-" フォントの設定
-set guifont=Ricty\ 12
-"見かけ上の行で移動
-nnoremap j gj
-nnoremap k gk
-" エンコーディングの優先順位
-set fileencodings=utf-8,cp932,euc-jisx0213
-"日本語入力関連 https://sites.google.com/site/fudist/Home/vim-nihongo-ban/vim-japanese
-"□や○の文字があってもカーソル位置がずれないようにする。
-set ambiwidth=double
-"画面最後の行をできる限り表示する。
-set display+=lastline
-" コマンドラインモードでTABキーによるファイル名補完を有効にする
-set wildmenu wildmode=list:longest,full
-
-"インデント
-set smarttab
+"indent
 set expandtab
-set smartindent
+set smarttab
 set tabstop=4
 set shiftwidth=4
-set softtabstop=0
-" set Filetype of .sv file
-autocmd vimrc BufNewFile,BufRead *.sv setf systemverilog
-" indentation set to 2.
-autocmd vimrc FileType html,xhtml,css,xml set shiftwidth=2 softtabstop=2
-autocmd vimrc FileType vhdl,verilog,systemverilog set shiftwidth=2 softtabstop=2
-" in makefiles, do not expand tabs to spaces
-autocmd vimrc FileType make set noexpandtab shiftwidth=4 softtabstop=0
+set softtabstop=4
+set autoindent
 
-"バックアップファイルを作らない
+"enable file type detection, plugin, indent
+filetype plugin indent on
+"enable syntax highlight
+if has('syntax')
+    syntax on
+endif
+
+" font
+"if has('gui')
+"    set guifont=Ricty\ 12
+"endif
+
+"show matching brackets
+set showmatch
+
+"show search results while typing
+set incsearch
+"ignore case when pattern contains only lowercase
+set ignorecase
+set smartcase
+"searches wrap around the end of the file
+set wrapscan
+"highlight all matches
+set hlsearch
+"stop highlighting by pushing <ESC> twice
+nnoremap <Esc><Esc> :nohlsearch<CR><Esc>
+
+"move cursor by display lines
+nnoremap j gj
+nnoremap k gk
+nnoremap <Down> gj
+nnoremap <Up>   gk
+
+" Better command-line completion
+if has('wildmenu')
+    set wildmenu
+    set wildmode=list:longest,full
+endif
+
+"copy to clipboard
+if has('clipboard')
+    set clipboard&
+    set clipboard^=unnamed,unnamedplus
+endif
+
+"encoding
+"set encoding=utf-8
+"set fileencodings=ucs-bom,iso-2022-jp-3,iso-2022-jp,eucjp-ms,euc-jisx0213,euc-jp,sjis,cp932,utf-8
+"Japanese related setting: https://sites.google.com/site/fudist/Home/vim-nihongo-ban/vim-japanese
+if has('multi_byte')
+    "Use twice the width for multi-byte characters
+    set ambiwidth=double
+endif
+" don't insert space when multi-byte
+set formatoptions+=mMj
+"as much as possible of the last line will be displayed.
+set display+=lastline
+
+"do not make a backup
 set nobackup
-" ファイルを閉じてもundoできるようにする
+
+"http://vim.wikia.com/wiki/Example_vimrc
+"buffer becomes hidden when abandoned
+set hidden
+"automatically read changed file again
+set autoread
+" Show partial commands in the last line of the screen
+set showcmd
+" Allow backspacing over autoindent, line breaks and start of insert action
+set backspace=indent,eol,start
+" Display the cursor position 
+set ruler
+" Always display the status line, even if only one window is displayed
+set laststatus=2
+" raise a dialogue asking if you wish to save changed files.
+set confirm
+ 
+" Enable use of the mouse for all modes
+set mouse=a
+ 
+" Set the command window height to 2 lines, to avoid many cases of having to
+" "press <Enter> to continue"
+set cmdheight=2
+
+"restore undo history
 if has('persistent_undo')
+    if !isdirectory(expand('~/.vim/undo'))
+        call mkdir(expand('~/.vim/undo'))
+    endif
 	set undodir=~/.vim/undo
 	set undofile
 endif
 
-autocmd vimrc BufNewFile *.cpp 0r $HOME/.vim/template/cpp.txt
-
-"NeoBundle Scripts-----------------------------
-if &compatible
-  set nocompatible               " Be iMproved
+"if buffer is already open, focus the window
+if has('gui')
+  packadd! editexisting
 endif
-" Required:
-set runtimepath+=/home/kivantium/.vim/bundle/neobundle.vim/
-call neobundle#begin(expand('/home/kivantium/.vim/bundle'))
-NeoBundleFetch 'Shougo/neobundle.vim'
-" Bundles
-NeoBundle 'Shougo/neocomplete.vim'
-NeoBundle 'thinca/vim-quickrun'
-NeoBundle 'Yggdroot/indentLine'
-" Required:
-call neobundle#end()
-filetype plugin indent on
-" If there are uninstalled bundles found on startup,
-" this will conveniently prompt you to install them.
-NeoBundleCheck
-"End NeoBundle Scripts-------------------------
 
-" vim -b : edit binary using xxd-format!
-autocmd vimrc BufReadPre  *.bin let &bin=1
-autocmd vimrc BufReadPost *.bin if &bin | %!xxd
-autocmd vimrc BufReadPost *.bin set ft=xxd | endif
-autocmd vimrc BufWritePre *.bin if &bin | %!xxd -r
-autocmd vimrc BufWritePre *.bin endif
-autocmd vimrc BufWritePost *.bin if &bin | %!xxd
-autocmd vimrc BufWritePost *.bin set nomod | endif
-
-" indentLineを高速に
-let g:indentLine_faster = 1
-" これを入れないとLaTeXで数式を打つときに平文で表示されなくなる
-let g:tex_conceal=''
-" neocomlete関連の設定
-" Disable AutoComplPop.
-let g:acp_enableAtStartup = 0
-" Use neocomplete.
-let g:neocomplete#enable_at_startup = 1
-" Use smartcase.
-let g:neocomplete#enable_smart_case = 1
-" Set minimum syntax keyword length.
-let g:neocomplete#sources#syntax#min_keyword_length = 3
-let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
-" Define dictionary.
-let g:neocomplete#sources#dictionary#dictionaries = {'default' : ''}
-" Define keyword.
-if !exists('g:neocomplete#keyword_patterns')
-  let g:neocomplete#keyword_patterns = {}
-endif
-let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-" Enable omni completion.
-autocmd vimrc FileType c set omnifunc=ccomplete#Complete
-autocmd vimrc FileType css setlocal omnifunc=csscomplete#CompleteCSS
-autocmd vimrc FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-autocmd vimrc FileType java setlocal omnifunc=javacomplete#Complete
-autocmd vimrc FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-autocmd vimrc FileType python setlocal omnifunc=pythoncomplete#Complete
-autocmd vimrc FileType php setlocal omnifunc=phpcomplete#CompletePHP
-autocmd vimrc FileType ruby setlocal omnifunc=rubycomplete#Complete
-autocmd vimrc FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-" Enable heavy omni completion.
-if !exists('g:neocomplete#sources#omni#input_patterns')
-  let g:neocomplete#sources#omni#input_patterns = {}
-endif
-let g:neocomplete#sources#omni#input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
-let g:neocomplete#sources#omni#input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
-"インクルードパスの指定
-let g:neocomplete#include_paths = {
-  \ 'c'    : '.,/usr/include',
-  \ 'cpp'    : '.,/usr/include',
-  \ }
-"インクルード文のパターンを指定
-let g:neocomplete#include_patterns = {
-  \ 'c' : '^\s*#\s*include',
-  \ 'cpp' : '^\s*#\s*include',
-  \ }
+"settings for binary mode
+augroup vimrc
+    autocmd!
+    autocmd BufReadPre  *.bin let &bin=1
+    autocmd BufReadPost *.bin if &bin | %!xxd
+    autocmd BufReadPost *.bin set ft=xxd | endif
+    autocmd BufWritePre *.bin if &bin | %!xxd -r
+    autocmd BufWritePre *.bin endif
+    autocmd BufWritePost *.bin if &bin | %!xxd
+    autocmd BufWritePost *.bin set nomod | endif
+augroup END
